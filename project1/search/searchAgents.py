@@ -476,13 +476,13 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
 
     The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
     (see game.py) of either True or False. You can call foodGrid.asList() to get
-    a list of food coordinates instead.
+    a list of food coordinates instead.                asList()把所有还没吃掉的食物转换为坐标列表
 
     If you want access to info like walls, capsules, etc., you can query the
     problem.  For example, problem.walls gives you a Grid of where the walls
-    are.
+    are.           Returns a Grid of boolean wall indicator variables  walls[x][y] == True
 
-    If you want to *store* information to be reused in other calls to the
+    If you want to *store* information to be reused in other calls to the     一些昂贵的计算结果存在 problem.heuristicInfo 
     heuristic, there is a dictionary called problem.heuristicInfo that you can
     use. For example, if you only want to count the walls once and store that
     value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
@@ -491,8 +491,19 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
-
+    x1=foodGrid.count()
+    max_dis=0
+    food_locations=foodGrid.asList()
+    if not food_locations:
+        return 0
+    #max_dis = max(util.manhattanDistance(position, food_location) for food_location in food_locations)
+    for food_location in food_locations:
+        key = frozenset([position, food_location]) #对称
+        if(position,food_location) not in problem.heuristicInfo :
+           problem.heuristicInfo[key] =mazeDistance(position, food_location, problem.startingGameState) #存储进去
+           if problem.heuristicInfo[key]>max_dis:
+               max_dis=problem.heuristicInfo[key]
+    return max_dis
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -571,7 +582,7 @@ def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pa
     you have already built. The gameState can be any game state -- Pacman's
     position in that state is ignored.
 
-    Example usage: mazeDistance( (2,4), (5,6), gameState)
+    Example usage: tance( (2,4), (5,6), gameState)
 
     This might be a useful helper function for your ApproximateSearchAgent.
     """
